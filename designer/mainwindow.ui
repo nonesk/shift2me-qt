@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QTabWidget" name="tabWidget_2">
+       <widget class="QTabWidget" name="tabs">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -29,12 +29,12 @@
          <enum>QTabWidget::Rounded</enum>
         </property>
         <property name="currentIndex">
-         <number>2</number>
+         <number>0</number>
         </property>
         <property name="documentMode">
          <bool>false</bool>
         </property>
-        <widget class="QWidget" name="tab_3">
+        <widget class="QWidget" name="chemshiftTab">
          <property name="enabled">
           <bool>true</bool>
          </property>
@@ -45,51 +45,25 @@
           <enum>Qt::PreventContextMenu</enum>
          </property>
          <attribute name="title">
-          <string>Tab 1</string>
+          <string>Chemical Shifts</string>
          </attribute>
-         <layout class="QGridLayout" name="gridLayout_6">
+         <layout class="QGridLayout" name="chemshiftTabLayout">
           <property name="horizontalSpacing">
            <number>25</number>
           </property>
-          <item row="0" column="1">
-           <widget class="QSlider" name="verticalSlider_3">
-            <property name="layoutDirection">
-             <enum>Qt::LeftToRight</enum>
-            </property>
-            <property name="sliderPosition">
-             <number>0</number>
-            </property>
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="invertedAppearance">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>0</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QGraphicsView" name="graphicsView"/>
-          </item>
-          <item row="0" column="4">
-           <widget class="QGraphicsView" name="graphicsView_2"/>
-          </item>
           <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_2"/>
+           <widget class="QDoubleSpinBox" name="cutoffSpinBox"/>
           </item>
           <item row="0" column="0">
-           <widget class="QSlider" name="verticalSlider_2">
+           <widget class="QSlider" name="stepSlider">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set titration step to view chemical shifts variations&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="layoutDirection">
              <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="minimum">
+             <number>1</number>
             </property>
             <property name="maximum">
              <number>10</number>
@@ -105,12 +79,41 @@
             </property>
            </widget>
           </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="stepLabel">
+            <property name="text">
+             <string>0</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QSlider" name="cutoffSlider">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set cut-off&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="sliderPosition">
+             <number>0</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="invertedAppearance">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="2">
-           <widget class="QListView" name="listView"/>
+           <widget class="QChartView" name="widget_2" native="true"/>
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="tab_5">
+        <widget class="QWidget" name="tab2">
          <property name="enabled">
           <bool>true</bool>
          </property>
@@ -123,7 +126,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="tab_4">
+        <widget class="QWidget" name="protocoleTab">
          <attribute name="title">
           <string>Protocole</string>
          </attribute>
@@ -169,7 +172,7 @@
                <property name="spacing">
                 <number>15</number>
                </property>
-               <item row="1" column="0">
+               <item row="2" column="0">
                 <widget class="QGroupBox" name="groupBox_2">
                  <property name="title">
                   <string>Volumes (µL)</string>
@@ -372,8 +375,21 @@
                  </layout>
                 </widget>
                </item>
-               <item row="2" column="0">
+               <item row="3" column="0">
                 <spacer name="verticalSpacer_3">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="1" column="0">
+                <spacer name="verticalSpacer">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
                  </property>
@@ -450,12 +466,20 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QChartView</class>
+   <extends>QWidget</extends>
+   <header>PyQt5/QtChart</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
-   <sender>verticalSlider_2</sender>
+   <sender>stepSlider</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>label_3</receiver>
+   <receiver>stepLabel</receiver>
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">

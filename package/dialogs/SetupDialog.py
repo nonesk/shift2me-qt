@@ -22,14 +22,6 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         with open(filePath, "r") as fh:
             self.df = pd.read_table(fh, sep='\\s+', header=header)
             self.modelReset.emit()
-            # print(df)
-            # for idx, row in df.iterrows():
-            #     print(row)
-                # items = [
-                #     QtGui.QStandardItem(field) 
-                #     for field in row.values
-                # ]
-                # self.fileModel.appendRow(items)
 
     def rowCount(self, parent=QtCore.QModelIndex()):
         return len(self.df.index)
@@ -78,7 +70,7 @@ class SetupDialog(QtWidgets.QDialog):
 
         self.dirModel = QtWidgets.QFileSystemModel(self)
         self.dirModel.setFilter(QtCore.QDir.Files)
-        self.dirModel.setNameFilters(['*.list', '*.yml', '*.yaml'])
+        self.dirModel.setNameFilters(['*.list'])
         self.dirModel.setNameFilterDisables(False)
         self.dirModel.directoryLoaded.connect(self.auto_select_first)
         self.ui.fileListView.setModel(self.dirModel)
@@ -91,6 +83,7 @@ class SetupDialog(QtWidgets.QDialog):
             self.ui.protonColumn,
             self.ui.nitrogenColumn
             ]
+            
         self.ui.headerCheckbox.stateChanged.connect(self.reload_preview)
         print(QtCore.QDir.currentPath())
         self.setwd(QtCore.QDir.currentPath())
@@ -131,7 +124,8 @@ class SetupDialog(QtWidgets.QDialog):
 
         
     def browse(self, event):
-        directory = QtWidgets.QFileDialog.getExistingDirectory(self, "RMN Data directory", QtCore.QDir.currentPath())
+        directory = QtWidgets.QFileDialog.getExistingDirectory(self, "RMN Data directory")
+        print(directory)
         if directory:
             self.setwd(directory)
         return directory
@@ -166,4 +160,5 @@ class SetupDialog(QtWidgets.QDialog):
         for combo in self.atomCombo:
             combo.setEnabled(toggle)
         self.ui.filePreview.setEnabled(toggle)
+        self.ui.headerCheckbox.setEnabled(toggle)
         
