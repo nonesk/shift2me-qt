@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
 
-from PyQt5.QtCore import pyqtSlot as Slot
-from PyQt5 import QtCore, QtWidgets, QtGui
+import functools
 
+import pandas as pd
+import qtawesome as qta
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import pyqtSlot as Slot
 
 from package.ui.ui_setupdialog import Ui_Dialog
 from package.widgets.AtomComboWidget import AtomComboWidget
-import pandas as pd
-import functools
 
-import qtawesome as qta
 
 class PandasTableModel(QtCore.QAbstractTableModel):
     def __init__(self, parent=None, *args):
@@ -161,4 +161,3 @@ class SetupDialog(QtWidgets.QDialog):
             combo.setEnabled(toggle)
         self.ui.filePreview.setEnabled(toggle)
         self.ui.headerCheckbox.setEnabled(toggle)
-        

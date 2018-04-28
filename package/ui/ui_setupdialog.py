@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'designer/setupdialog.ui'
 #
-# Created by: PyQt5 UI code generator 5.10
+# Created by: PyQt5 UI code generator 5.10.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -65,6 +65,7 @@ class Ui_Dialog(object):
         self.residueColumn.setObjectName("residueColumn")
         self.formLayout_3.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.residueColumn)
         self.headerCheckbox = QtWidgets.QCheckBox(self.formWidget)
+        self.headerCheckbox.setEnabled(False)
         self.headerCheckbox.setChecked(True)
         self.headerCheckbox.setObjectName("headerCheckbox")
         self.formLayout_3.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.headerCheckbox)

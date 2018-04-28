@@ -7,4 +7,4 @@ class FileSystemModel(QFileSystemModel):
         super().__init__()
 
     def supportedDropActions(self):
-        return Qt.DropActions(Qt.MoveAction | Qt.TargetMoveAction)
+        return Qt.DropActions(Qt.MoveAction | Qt.TargetMoveAction | Qt.Action)

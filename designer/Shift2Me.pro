@@ -21,4 +21,6 @@ FORMS    += mainwindow.ui \
     setupdialog.ui
 
 DISTFILES += \
-    SetupDialog.py
+    SetupDialog.py \
+    TestForm.ui.qml \
+    Test.qml
