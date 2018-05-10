@@ -18,7 +18,8 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h
 
 FORMS    += mainwindow.ui \
-    setupdialog.ui
+    setupdialog.ui \
+    stock_dialog.ui
 
 DISTFILES += \
     SetupDialog.py \

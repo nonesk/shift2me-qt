@@ -6,7 +6,7 @@ RESOURCE_DIR = designer
 COMPILED_DIR = ./package/ui
  
 #UI files to compile
-UI_FILES = setupdialog.ui mainwindow.ui
+UI_FILES = setupdialog.ui mainwindow.ui stock_dialog.ui
 #Qt resource files to compile
 #RESOURCES = images.qrc 
  
