@@ -13,7 +13,7 @@ from PyQt5.QtGui import QBrush, QColor, QFont, QIcon, QPainter, QPen
 class BarChartController(QObject):
 
     def __init__(self, window, titration = None):
-        super().__init__()
+        super().__init__(window)
 
         self.parent = window
 

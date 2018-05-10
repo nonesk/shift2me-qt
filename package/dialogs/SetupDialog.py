@@ -1,65 +1,16 @@
-# -*- coding: utf-8 -*-
-
-
-import functools
-
-import pandas as pd
 import qtawesome as qta
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSlot as Slot
+from PyQt5.QtCore import QDir, Qt
 
+from package.delegates.SpinBoxDelegate import SpinBoxDelegate
+# from qtpandas.models.DataFrameModel import DataFrameModel
+# from qtpandas.views.DataTableView import DataTableWidget
+#from qtpandas.models.SupportedDtypes import SupportedDtypes
+from package.models.DataFrameModel import DataFrameModel
 from package.ui.ui_setupdialog import Ui_Dialog
 from package.widgets.AtomComboWidget import AtomComboWidget
 
-
-class PandasTableModel(QtCore.QAbstractTableModel):
-    def __init__(self, parent=None, *args):
-        super().__init__(parent)
-        self.df = pd.DataFrame()
-        
-
-    def load_csv(self, filePath, header):
-        with open(filePath, "r") as fh:
-            self.df = pd.read_table(fh, sep='\\s+', header=header)
-            self.modelReset.emit()
-
-    def rowCount(self, parent=QtCore.QModelIndex()):
-        return len(self.df.index)
-
-    def columnCount(self, parent=QtCore.QModelIndex()):
-        return len(self.df.columns.values)
-
-    def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
-        if role != QtCore.Qt.DisplayRole:
-            return QtCore.QVariant()
-
-        if orientation == QtCore.Qt.Horizontal:
-            try:
-                return self.df.columns.tolist()[section]
-            except (IndexError, ):
-                return QtCore.QVariant()
-        elif orientation == QtCore.Qt.Vertical:
-            try:
-                # return self.df.index.tolist()
-                return self.df.index.tolist()[section]
-            except (IndexError, ):
-                return QtCore.QVariant()
-
-    def data(self, index, role=QtCore.Qt.DisplayRole):
-        if role != QtCore.Qt.DisplayRole:
-            return QtCore.QVariant()
-
-        if not index.isValid():
-            return QtCore.QVariant()
-
-        return QtCore.QVariant(str(self.df.ix[index.row(), index.column()]))
-    
-    def sort(self, column, order):
-        colname = self.df.columns.tolist()[column]
-        self.layoutAboutToBeChanged.emit()
-        self.df.sort_values(colname, ascending= order == QtCore.Qt.AscendingOrder, inplace=True)
-        self.df.reset_index(inplace=True, drop=True)
-        self.layoutChanged.emit()
 
 class SetupDialog(QtWidgets.QDialog):
     def __init__(self):
@@ -69,14 +20,16 @@ class SetupDialog(QtWidgets.QDialog):
         self.patch_ui()
 
         self.dirModel = QtWidgets.QFileSystemModel(self)
-        self.dirModel.setFilter(QtCore.QDir.Files)
+        self.dirModel.setFilter(QDir.Files)
         self.dirModel.setNameFilters(['*.list'])
         self.dirModel.setNameFilterDisables(False)
         self.dirModel.directoryLoaded.connect(self.auto_select_first)
         self.ui.fileListView.setModel(self.dirModel)
 
-        self.fileModel = PandasTableModel()
+        self.fileModel = DataFrameModel(self)
         self.ui.filePreview.setModel(self.fileModel)
+        #self.delegate = SpinBoxDelegate()
+        #self.ui.filePreview.setItemDelegate(self.delegate)
 
         self.atomCombo = [
             self.ui.residueColumn,
@@ -85,15 +38,15 @@ class SetupDialog(QtWidgets.QDialog):
             ]
             
         self.ui.headerCheckbox.stateChanged.connect(self.reload_preview)
-        print(QtCore.QDir.currentPath())
-        self.setwd(QtCore.QDir.currentPath())
+        print(QDir.currentPath())
+        self.setwd(QDir.currentPath())
 
     #     self.comboValues = [combo.currentIndex for combo in self.atomCombo]
 
     #     for combo in self.atomCombo:
     #         combo.currentIndexChanged.connect(self.comboChange)
         
-    # @QtCore.pyqtSlot(int)
+    # @pyqtSlot(int)
     # def comboChange(self, index):
     #     for comboId, combo in enumerate(self.atomCombo):
     #         if combo.currentIndex == index:
@@ -113,14 +66,14 @@ class SetupDialog(QtWidgets.QDialog):
         self.load_csv(selected)
 
     def load_csv(self, modelIndex): 
-        print("Dialog caught signal")
         useHeaders = 'infer' if self.ui.headerCheckbox.isChecked() else None
-        self.fileModel.load_csv(filePath = self.dirModel.filePath(modelIndex), header = useHeaders)
+        self.fileModel.load_csv(filePath = self.dirModel.filePath(modelIndex),  header = useHeaders)
         if useHeaders:
-            options = list(self.fileModel.df.columns.values)
+            options = self.fileModel.df.columns.tolist()
         else:
             options = [ "Col {}".format(idx) for idx in range(len(self.fileModel.df.columns))]
         self.update_options(options)
+        print("kanar", self.fileModel.df.columns.tolist())
 
         
     def browse(self, event):
@@ -153,7 +106,7 @@ class SetupDialog(QtWidgets.QDialog):
             self.toggleUI(False)
 
     def patch_ui(self):
-        self.ui.editProtocoleBtn.setIcon(qta.icon('fa.flask'))
+        self.ui.editProtocoleBtn.setIcon(qta.icon('fa.cogs'))
 
     def toggleUI(self, toggle = True):
         self.ui.fileListView.setEnabled(toggle)
