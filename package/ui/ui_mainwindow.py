@@ -45,7 +45,7 @@ class Ui_MainWindow(object):
         self.gridLayout_5.setSpacing(6)
         self.gridLayout_5.setObjectName("gridLayout_5")
         self.splitter = QtWidgets.QSplitter(self.chemshiftTab)
-        self.splitter.setFrameShape(QtWidgets.QFrame.Box)
+        self.splitter.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.splitter.setOrientation(QtCore.Qt.Vertical)
         self.splitter.setHandleWidth(8)
         self.splitter.setObjectName("splitter")
@@ -326,7 +326,7 @@ class Ui_MainWindow(object):
         self.menuBar.addAction(self.menuEdit.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabs.setCurrentIndex(1)
+        self.tabs.setCurrentIndex(0)
         self.analyteComboBox.setCurrentIndex(-1)
         self.titrantComboBox.setCurrentIndex(-1)
         self.actionNew.triggered.connect(MainWindow.setup)

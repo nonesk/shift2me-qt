@@ -29,7 +29,7 @@
          <enum>QTabWidget::Rounded</enum>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <property name="documentMode">
          <bool>false</bool>
@@ -59,7 +59,7 @@
             <item row="0" column="0">
              <widget class="QSplitter" name="splitter">
               <property name="frameShape">
-               <enum>QFrame::Box</enum>
+               <enum>QFrame::NoFrame</enum>
               </property>
               <property name="orientation">
                <enum>Qt::Vertical</enum>
