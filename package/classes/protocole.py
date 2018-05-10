@@ -19,11 +19,35 @@ pd.set_option('precision', 3)
 ##      Shift2Me classes
 ## --------------------------------------------------------------------
 
+class StockSolution(object):
+
+    def __init__(self, name, concentration = 0):
+        self.setName(name)
+        self.setConcentration(concentration)
+
+    def __repr__(self):
+        return "{} [{}]".format(self.name, self.concentration)
+
+    def setConcentration(self, value):
+        if value >= 0:
+            self.concentration = value
+            return True
+        else:
+            return False
+
+    def setName(self, name):
+        self.name = str(name)
+
+    @classmethod
+    def from_dict(cls, d):
+        self = cls(d['name'], d['concentration'])
+        return self
+
 class TitrationProtocole(object):
     "A titration protocole tracker, wrapping around a pandas dataframe"
 
     INIT_FIELDS=('name', 'analyte', 'titrant', 'start_volume', 'add_volumes')
-    COLUMN_ALIASES = ('step', 'vol_add', 'vol_titrant', 'vol_total', 'conc_titrant', 'conc_analyte', 'ratio')
+    COLUMN_ALIASES = ('vol_add', 'vol_titrant', 'vol_total', 'conc_titrant', 'conc_analyte', 'ratio', 'step', )
 
     def __init__(self, initStream=None, **kwargs):
 
@@ -33,16 +57,11 @@ class TitrationProtocole(object):
         self.isInit = False # False while parameters are incorrect
 
         # Initial titrant concentration
-        self.titrant = {
-            "name" : 'titrant',
-            "concentration" : 0
-        }
+
+        self.titrant = StockSolution("titrant", 0)
 
         # Initial analyte concentration
-        self.analyte = {
-            "name" : 'analyte',
-            'concentration' : 0
-        }
+        self.analyte = StockSolution("analyte", 0)
 
         # Initial total volume
         self.startVol = 0
@@ -89,24 +108,23 @@ class TitrationProtocole(object):
 
     def update(self, index=True):
         "Rebuild dataframe from current volumes list"
-        self._df = pd.DataFrame(
-            index=list(range(len(self.volumes))) or [0],
-            columns=self.COLUMN_ALIASES,
-            data=0)
+        # self._df = pd.DataFrame(
+        #     index=list(range(len(self.volumes))) or [0],
+        #     columns=self.COLUMN_ALIASES,
+        #     data=0)
         self.fill_df()
-        self.set_headers()
-        if index:
-            self._df.set_index('Step', inplace=True)
+        #self.set_headers()
         return self._df
 
     def fill_df(self):
         "Fill dataframe columns"
+        print(self.titrant, self.analyte)
         self._df['step'] = list(range(len(self.volumes)))
         self._df['vol_add'] = self.volumes
         self._df['vol_titrant'] = self._df['vol_add'].cumsum()
         self._df['vol_total'] = self.startVol + self._df['vol_titrant']
-        self._df['conc_titrant'] = self._df['vol_titrant'] * self.titrant['concentration'] / self._df['vol_total']
-        self._df['conc_analyte'] = self.analyteStartVol * self.analyte['concentration'] / self._df['vol_total']
+        self._df['conc_titrant'] = self._df['vol_titrant'] * self.titrant.concentration / self._df['vol_total']
+        self._df['conc_analyte'] = self.analyteStartVol * self.analyte.concentration / self._df['vol_total']
         self._df['ratio'] = self._df['conc_titrant'] / self._df['conc_analyte']
 
     def set_headers(self):
@@ -116,10 +134,9 @@ class TitrationProtocole(object):
         # Create headers list
         headers = list(map(
             lambda s: s.format(
-                titrant=self.titrant['name'],
-                analyte=self.analyte['name']),
+                titrant=self.titrant.name,
+                analyte=self.analyte.name),
             [
-                'Step',
                 'Added {titrant} (µL)',
                 'Total {titrant} (µL)',
                 'Total volume (µL)',
@@ -156,17 +173,17 @@ class TitrationProtocole(object):
     def validate(self):
         valid = True
 
-        if not self.titrant['name']:
-            self.titrant['name'] = 'titrant'
-        if not self.analyte['name']:
-            self.analyte['name'] = 'analyte'
+        if not self.titrant.name:
+            self.titrant.name = 'titrant'
+        if not self.analyte.name:
+            self.analyte.name = 'analyte'
 
-        if self.titrant['concentration'] <= 0:
-            self.titrant['concentration'] = 0
+        if self.titrant.concentration <= 0:
+            self.titrant.concentration = 0
             valid = False
 
-        if self.analyte['concentration'] <= 0:
-            self.analyte['concentration'] = 0
+        if self.analyte.concentration <= 0:
+            self.analyte.concentration = 0
             valid = False
 
         if self.startVol <= 0:
@@ -254,8 +271,8 @@ class TitrationProtocole(object):
         self.set_name(initDict.get('name'))
 
         # titrant, analyte initial names and concentration
-        self.titrant = initDict['titrant']
-        self.analyte = initDict['analyte']
+        self.titrant = StockSolution.from_dict(initDict['titrant'])
+        self.analyte = StockSolution.from_dict(initDict['analyte'])
         for initConcentration in (self.titrant, self.analyte):
             initConcentration['concentration'] = float(initConcentration['concentration'])
 
@@ -310,12 +327,30 @@ class TitrationProtocole(object):
     def add_volume(self, volume):
         "Add a volume for next protocole step"
         self.volumes.append(volume)
+        self._df = self.df.append(dict.fromkeys(self.COLUMN_ALIASES, 0), ignore_index=True)
+        print(self.df)
         self.update()
 
     def add_volumes(self, volumes):
         "Add a list of volumes for next protocole steps"
         self.volumes += volumes
         self.update()
+
+    def set_analyte_volume(self, volume):
+        if volume <= 0:
+            raise ValueError("Analyte volume must be strictly positive")
+        else:
+            self.analyteStartVol = volume
+            print(self.analyteStartVol)
+            self.update()
+    
+    def set_initial_volume(self, volume):
+        if volume < self.analyteStartVol:
+            raise ValueError("Total volume must be greater or equal to analyte volume")
+        else:
+            self.startVol = volume
+            print(self.startVol)
+            self.update()
 
 ## -----------------------------------------------------
 ##         Properties
