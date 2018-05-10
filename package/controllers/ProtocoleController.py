@@ -101,11 +101,11 @@ class ProtocoleController(QObject):
 
     def init_volume_chart(self):
         self.volumeSeries = QLineSeries()
-        self.volumeSeries.setName("Titrant volume")
+        self.volumeSeries.setName("Titrant")
         self.volumeSeries.setPointsVisible()
 
         self.totalVolumeSeries = QLineSeries()
-        self.totalVolumeSeries.setName("Total volume")
+        self.totalVolumeSeries.setName("Total")
         self.totalVolumeSeries.setPointsVisible()
 
         # self.areaSeries = QAreaSeries(self.volumeSeries, self.totalVolumeSeries)
